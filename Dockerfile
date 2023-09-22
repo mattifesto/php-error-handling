@@ -2,6 +2,13 @@ FROM php:cli
 
 
 
+# Debian - Install PHP Composer (MC v1)
+# https://hub.docker.com/_/composer/
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+
+
 # Debian - Install Git (MC v2)
 
 RUN apt-get update
