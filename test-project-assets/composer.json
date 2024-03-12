@@ -1,0 +1,16 @@
+{
+    "repositories":
+    [
+        {
+            "type": "path",
+            "url": "/com.docker.devenvironments.code",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
+    "require":
+    {
+        "mattifesto/error-handling": "@dev"
+    }
+}
