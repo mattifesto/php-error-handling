@@ -31,4 +31,4 @@ docker build \
     --tag php-error-handling-test:latest \
     .
 
-docker compose -f run-tests-compose.yaml up -d
+docker compose -f run-tests-docker-compose.yaml up -d
