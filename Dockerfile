@@ -2,9 +2,12 @@ FROM php:cli
 
 
 
-# Debian - Install PHP Composer (MC v1)
+# Debian - Install PHP Composer (Mattifesto 2024-03-14T17:33:00-07:00)
 # https://hub.docker.com/_/composer/
 
+RUN apt-get update
+RUN apt-get install -y zlib1g-dev libzip-dev unzip
+RUN docker-php-ext-install zip
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 
