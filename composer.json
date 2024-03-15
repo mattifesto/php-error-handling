@@ -4,18 +4,11 @@
             "src/"
         ]
     },
-    "autoload-dev": {
-        "classmap": [
-            "src-test/"
-        ]
-    },
     "description": "Error and exception handling.",
     "license": "MIT",
     "name": "mattifesto/error-handling",
     "require": {
-        "php": ">=8.0"
-    },
-    "require-dev": {
-        "mattifesto/testing": "@dev"
+        "php": ">=8.0",
+        "opensearch-project/opensearch-php": "^2.2"
     }
 }
