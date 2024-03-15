@@ -5,6 +5,10 @@ services:
   php-error-handling-test:
     container_name:
       php-error-handling-test-container
+    environment:
+      - MATTIFESTO_OPEN_SEARCH_URL=${MATTIFESTO_OPEN_SEARCH_URL}
+      - MATTIFESTO_OPEN_SEARCH_USERNAME=${MATTIFESTO_OPEN_SEARCH_USERNAME}
+      - MATTIFESTO_OPEN_SEARCH_PASSWORD=${MATTIFESTO_OPEN_SEARCH_PASSWORD}
     image:
       php-error-handling-test:latest
     ports:
