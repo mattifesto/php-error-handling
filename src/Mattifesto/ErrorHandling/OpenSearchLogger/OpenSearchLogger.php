@@ -96,6 +96,28 @@ final class OpenSearchLogger
      *
      * If there is no value set an empty string is returned.
      */
+    private static function getOpenSearchIndex(): string
+    {
+        static $openSearchIndex = null;
+
+        if ($openSearchIndex === null) {
+            $openSearchIndex = getenv('MATTIFESTO_OPEN_SEARCH_INDEX');
+
+            if ($openSearchIndex === false) {
+                $openSearchIndex = '';
+            }
+        }
+
+        return $openSearchIndex;
+    }
+
+
+
+    /**
+     * @return string
+     *
+     * If there is no value set an empty string is returned.
+     */
     private static function getOpenSearchPassword(): string
     {
         static $openSearchURL = null;
