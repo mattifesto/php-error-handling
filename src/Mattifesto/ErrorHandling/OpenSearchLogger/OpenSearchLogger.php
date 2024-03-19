@@ -4,7 +4,9 @@ namespace Mattifesto\ErrorHandling;
 
 use \DateTime;
 use \DateTimeZone;
+use \Exception;
 use \Throwable;
+use \OpenSearch\ClientBuilder;
 use \Mattifesto\ErrorHandling\ExceptionRenderer;
 
 final class OpenSearchLogger
@@ -221,13 +223,19 @@ final class OpenSearchLogger
     private static function sendToOpenSearch(
         string $messageArgument
     ): string {
-        $openSearchIndex = 'logs2';
-        $openSearchURL = self::getOpenSearchURL();
-        $openSearchUsername = self::getOpenSearchUsername();
-        $openSearchPassword = self::getOpenSearchPassword();
+        $openSearchIndex = self::getOpenSearchIndex();
+        $openSearchEndpoint = self::getOpenSearchEndpoint();
 
-        if ($openSearchURL === '' || $openSearchUsername === '' || $openSearchPassword === '') {
-            return '';
+        if (
+            $openSearchIndex === ''
+        ) {
+            throw new Exception('OpenSearch index not set');
+        }
+
+        if (
+            $openSearchEndpoint === ''
+        ) {
+            throw new Exception('OpenSearch endpoint not set');
         }
 
         $microtime = microtime(true);
@@ -259,7 +267,7 @@ final class OpenSearchLogger
         $ch = curl_init();
 
         // Set the cURL options
-        curl_setopt($ch, CURLOPT_URL, "{$openSearchURL}/logs1/_doc/");
+        curl_setopt($ch, CURLOPT_URL, "{$openSearchEndpoint}/logs1/_doc/");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification (you might want to set it to true in production)
