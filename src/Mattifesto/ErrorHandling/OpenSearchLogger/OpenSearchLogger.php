@@ -120,17 +120,17 @@ final class OpenSearchLogger
      */
     private static function getOpenSearchPassword(): string
     {
-        static $openSearchURL = null;
+        static $openSearchPassword = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_PASSWORD');
+        if ($openSearchPassword === null) {
+            $openSearchPassword = getenv('MATTIFESTO_OPEN_SEARCH_PASSWORD');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchPassword === false) {
+                $openSearchPassword = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchPassword;
     }
 
 
