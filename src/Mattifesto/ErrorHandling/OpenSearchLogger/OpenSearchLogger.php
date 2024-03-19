@@ -164,17 +164,17 @@ final class OpenSearchLogger
      */
     private static function getOpenSearchUsername(): string
     {
-        static $openSearchURL = null;
+        static $openSearchUsername = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_USERNAME');
+        if ($openSearchUsername === null) {
+            $openSearchUsername = getenv('MATTIFESTO_OPEN_SEARCH_USERNAME');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchUsername === false) {
+                $openSearchUsername = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchUsername;
     }
 
 
