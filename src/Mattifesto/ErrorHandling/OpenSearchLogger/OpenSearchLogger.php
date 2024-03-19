@@ -56,19 +56,34 @@ final class OpenSearchLogger
         static $openSearchClient = null;
 
         if ($openSearchClient === null) {
-            $openSearchClient =
-                (new \OpenSearch\ClientBuilder())
-                ->setHosts(
-                    [
-                        self::getOpenSearchURL()
-                    ]
-                )
-                ->setBasicAuthentication(
-                    self::getOpenSearchUsername(),
-                    self::getOpenSearchPassword()
-                )
-                ->setSSLVerification(false) // For testing only. Use certificate for validation
-                ->build();
+            $region = getenv('AWS_DEFAULT_REGION');
+
+            if (!empty($region)) {
+                $openSearchClient = (new ClientBuilder())
+                    ->setHosts(
+                        [
+                            self::getOpenSearchEndpoint()
+                        ]
+                    )
+                    ->setSigV4Region($region)
+                    ->setSigV4Service('aoss')
+                    ->setSigV4CredentialProvider(true)
+                    ->build();
+            } else {
+                $openSearchClient =
+                    (new ClientBuilder())
+                    ->setHosts(
+                        [
+                            self::getOpenSearchEndpoint()
+                        ]
+                    )
+                    ->setBasicAuthentication(
+                        self::getOpenSearchUsername(),
+                        self::getOpenSearchPassword()
+                    )
+                    ->setSSLVerification(false) // For testing only. Use certificate for validation
+                    ->build();
+            }
         }
 
         return $openSearchClient;
