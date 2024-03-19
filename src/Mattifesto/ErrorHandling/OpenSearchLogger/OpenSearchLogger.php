@@ -140,19 +140,19 @@ final class OpenSearchLogger
      *
      * If there is no value set an empty string is returned.
      */
-    private static function getOpenSearchURL(): string
+    private static function getOpenSearchEndpoint(): string
     {
-        static $openSearchURL = null;
+        static $openSearchEndpoint = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_URL');
+        if ($openSearchEndpoint === null) {
+            $openSearchEndpoint = getenv('MATTIFESTO_OPEN_SEARCH_ENDPOINT');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchEndpoint === false) {
+                $openSearchEndpoint = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchEndpoint;
     }
 
 
