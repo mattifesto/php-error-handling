@@ -104,7 +104,7 @@ function function2ErrorHandler(
     $randomInt = random_int(0, PHP_INT_MAX);
 
     throw new RuntimeException(
-        "an dddddd exception occurred in function2(): {$randomInt}",
+        "an exception occurred in function2(): {$randomInt}",
         0,
         $throwableArgument
     );
