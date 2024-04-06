@@ -5,15 +5,5 @@ services:
   php-error-handling-test:
     container_name:
       php-error-handling-test-container
-    environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-      - MATTIFESTO_OPEN_SEARCH_ENDPOINT=${MATTIFESTO_OPEN_SEARCH_ENDPOINT}
-      - MATTIFESTO_OPEN_SEARCH_INDEX=${MATTIFESTO_OPEN_SEARCH_INDEX}
-      - MATTIFESTO_OPEN_SEARCH_USERNAME=${MATTIFESTO_OPEN_SEARCH_USERNAME}
-      - MATTIFESTO_OPEN_SEARCH_PASSWORD=${MATTIFESTO_OPEN_SEARCH_PASSWORD}
     image:
       php-error-handling-test:latest
-    ports:
-      - 56565:80
