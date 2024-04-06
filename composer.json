@@ -8,8 +8,6 @@
     "license": "MIT",
     "name": "mattifesto/error-handling",
     "require": {
-        "php": ">=8.0",
-        "opensearch-project/opensearch-php": "^2.2",
-        "aws/aws-sdk-php": "^3.301"
+        "php": ">=8.0"
     }
 }
