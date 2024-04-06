@@ -4,7 +4,9 @@ namespace Mattifesto\ErrorHandling;
 
 use \DateTime;
 use \DateTimeZone;
+use \Exception;
 use \Throwable;
+use \OpenSearch\ClientBuilder;
 use \Mattifesto\ErrorHandling\ExceptionRenderer;
 
 final class OpenSearchLogger
@@ -56,19 +58,34 @@ final class OpenSearchLogger
         static $openSearchClient = null;
 
         if ($openSearchClient === null) {
-            $openSearchClient =
-                (new \OpenSearch\ClientBuilder())
-                ->setHosts(
-                    [
-                        self::getOpenSearchURL()
-                    ]
-                )
-                ->setBasicAuthentication(
-                    self::getOpenSearchUsername(),
-                    self::getOpenSearchPassword()
-                )
-                ->setSSLVerification(false) // For testing only. Use certificate for validation
-                ->build();
+            $region = getenv('AWS_DEFAULT_REGION');
+
+            if (!empty($region)) {
+                $openSearchClient = (new ClientBuilder())
+                    ->setHosts(
+                        [
+                            self::getOpenSearchEndpoint()
+                        ]
+                    )
+                    ->setSigV4Region($region)
+                    ->setSigV4Service('aoss')
+                    ->setSigV4CredentialProvider(true)
+                    ->build();
+            } else {
+                $openSearchClient =
+                    (new ClientBuilder())
+                    ->setHosts(
+                        [
+                            self::getOpenSearchEndpoint()
+                        ]
+                    )
+                    ->setBasicAuthentication(
+                        self::getOpenSearchUsername(),
+                        self::getOpenSearchPassword()
+                    )
+                    ->setSSLVerification(false) // For testing only. Use certificate for validation
+                    ->build();
+            }
         }
 
         return $openSearchClient;
@@ -81,19 +98,19 @@ final class OpenSearchLogger
      *
      * If there is no value set an empty string is returned.
      */
-    private static function getOpenSearchPassword(): string
+    private static function getOpenSearchIndex(): string
     {
-        static $openSearchURL = null;
+        static $openSearchIndex = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_PASSWORD');
+        if ($openSearchIndex === null) {
+            $openSearchIndex = getenv('MATTIFESTO_OPEN_SEARCH_INDEX');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchIndex === false) {
+                $openSearchIndex = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchIndex;
     }
 
 
@@ -103,19 +120,41 @@ final class OpenSearchLogger
      *
      * If there is no value set an empty string is returned.
      */
-    private static function getOpenSearchURL(): string
+    private static function getOpenSearchPassword(): string
     {
-        static $openSearchURL = null;
+        static $openSearchPassword = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_URL');
+        if ($openSearchPassword === null) {
+            $openSearchPassword = getenv('MATTIFESTO_OPEN_SEARCH_PASSWORD');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchPassword === false) {
+                $openSearchPassword = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchPassword;
+    }
+
+
+
+    /**
+     * @return string
+     *
+     * If there is no value set an empty string is returned.
+     */
+    private static function getOpenSearchEndpoint(): string
+    {
+        static $openSearchEndpoint = null;
+
+        if ($openSearchEndpoint === null) {
+            $openSearchEndpoint = getenv('MATTIFESTO_OPEN_SEARCH_ENDPOINT');
+
+            if ($openSearchEndpoint === false) {
+                $openSearchEndpoint = '';
+            }
+        }
+
+        return $openSearchEndpoint;
     }
 
 
@@ -127,17 +166,17 @@ final class OpenSearchLogger
      */
     private static function getOpenSearchUsername(): string
     {
-        static $openSearchURL = null;
+        static $openSearchUsername = null;
 
-        if ($openSearchURL === null) {
-            $openSearchURL = getenv('MATTIFESTO_OPEN_SEARCH_USERNAME');
+        if ($openSearchUsername === null) {
+            $openSearchUsername = getenv('MATTIFESTO_OPEN_SEARCH_USERNAME');
 
-            if ($openSearchURL === false) {
-                $openSearchURL = '';
+            if ($openSearchUsername === false) {
+                $openSearchUsername = '';
             }
         }
 
-        return $openSearchURL;
+        return $openSearchUsername;
     }
 
 
@@ -184,13 +223,19 @@ final class OpenSearchLogger
     private static function sendToOpenSearch(
         string $messageArgument
     ): string {
-        $openSearchIndex = 'logs2';
-        $openSearchURL = self::getOpenSearchURL();
-        $openSearchUsername = self::getOpenSearchUsername();
-        $openSearchPassword = self::getOpenSearchPassword();
+        $openSearchIndex = self::getOpenSearchIndex();
+        $openSearchEndpoint = self::getOpenSearchEndpoint();
 
-        if ($openSearchURL === '' || $openSearchUsername === '' || $openSearchPassword === '') {
-            return '';
+        if (
+            $openSearchIndex === ''
+        ) {
+            throw new Exception('OpenSearch index not set');
+        }
+
+        if (
+            $openSearchEndpoint === ''
+        ) {
+            throw new Exception('OpenSearch endpoint not set');
         }
 
         $microtime = microtime(true);
@@ -222,7 +267,7 @@ final class OpenSearchLogger
         $ch = curl_init();
 
         // Set the cURL options
-        curl_setopt($ch, CURLOPT_URL, "{$openSearchURL}/logs1/_doc/");
+        curl_setopt($ch, CURLOPT_URL, "{$openSearchEndpoint}/logs1/_doc/");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification (you might want to set it to true in production)

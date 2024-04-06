@@ -2,11 +2,22 @@
 
 require 'vendor/autoload.php';
 
+use Aws\S3\S3Client;
+use Aws\Credentials\CredentialProvider;
 use \Mattifesto\ErrorHandling\ExceptionRenderer;
 use \Mattifesto\ErrorHandling\OpenSearchLogger;
 
-$timezone = new DateTimeZone('America/Los_Angeles');
-$date = new DateTime('now', $timezone);
+$arrayOfTests =
+    [
+        [
+            'title' => 'AWS Connection',
+            'callable' => 'runAWSConnectionTest',
+        ],
+        [
+            'title' => 'exceptionToText',
+            'callable' => 'runExceptionToTextTest',
+        ]
+    ];
 
 ?>
 <!doctype html>
@@ -17,21 +28,36 @@ $date = new DateTime('now', $timezone);
 </head>
 
 <body>
-    <p><?= $date->format('c') ?></p>
+    <h1>PHP Error Handling Tests</h1>
+
     <?php
 
-    try {
-        function1();
-    } catch (Throwable $throwable) {
-        echo '<pre>';
-        echo htmlspecialchars(
-            ExceptionRenderer::exceptionToText($throwable)
-        );
-        echo '</pre>';
+    for ($testIndex = 0; $testIndex < count($arrayOfTests); $testIndex++) {
+        $test = $arrayOfTests[$testIndex];
+        $title = $test['title'];
+        $titleAsHTML = htmlspecialchars($title);
+        $callable = $test['callable'];
 
-        $result = OpenSearchLogger::logThrowable($throwable);
+        echo "<h2>Test Index {$testIndex}: {$titleAsHTML}</h2>";
 
-        echo "<pre>result: {$result}</pre>";
+        try {
+            $result = $callable();
+
+            if (!is_string($result)) {
+                $result = json_encode($result, JSON_PRETTY_PRINT);
+            }
+
+            $resultAsHTML = htmlspecialchars($result);
+
+            echo "<pre>{$resultAsHTML}</pre>";
+        } catch (Throwable $throwable) {
+            echo "<h3>An unexpected exception occurred while running this test.</h3>";
+            echo '<pre>';
+            echo htmlspecialchars(
+                ExceptionRenderer::exceptionToText($throwable)
+            );
+            echo '</pre>';
+        }
     }
 
     ?>
@@ -82,4 +108,74 @@ function function2ErrorHandler(
         0,
         $throwableArgument
     );
+}
+
+
+
+function runAWSConnectionTest(): string
+{
+    $resultAsText = '';
+
+    $arrayOfAWSEnvironmentVariables =
+        [
+            'AWS_ACCESS_KEY_ID',
+            'AWS_SECRET_ACCESS_KEY',
+            'AWS_DEFAULT_REGION',
+        ];
+
+    foreach ($arrayOfAWSEnvironmentVariables as $awsEnvironmentVariable) {
+        $variableIsSet = !empty(getenv($awsEnvironmentVariable));
+
+        $resultAsText .=
+            "{$awsEnvironmentVariable} is set: " .
+            ($variableIsSet ? 'yes' : 'no') .
+            PHP_EOL;
+    }
+
+    // Use environment variables for AWS credentials
+    $provider = CredentialProvider::env();
+    $provider = CredentialProvider::memoize($provider);
+
+    // Get the default region from environment variables
+    $region = getenv('AWS_DEFAULT_REGION');
+
+    // Create an S3 client with the region
+    $s3 = new S3Client([
+        'version'     => '2006-03-01',
+        'region'      => $region,
+        'credentials' => $provider,
+    ]);
+
+    // Try to list buckets to confirm the connection
+    $buckets = $s3->listBuckets();
+    $resultAsText .= "Successfully connected to AWS. Here are your S3 buckets:\n";
+
+    foreach ($buckets['Buckets'] as $bucket) {
+        $resultAsText .= "- {$bucket['Name']}\n";
+    }
+
+    return $resultAsText;
+}
+
+
+
+function runExceptionToTextTest(): string
+{
+    $resultAsText = "This test creates a complex exception and uses exceptionToText to render it as text. Here is the text generated:\n\n";
+
+    try {
+        function1();
+    } catch (Throwable $throwable) {
+        $resultAsText .= ExceptionRenderer::exceptionToText($throwable) . "\n\n";
+
+        $result = OpenSearchLogger::logThrowable($throwable);
+
+        $resultAsText .= "result: {$result}\n";
+
+        return $resultAsText;
+    }
+
+    $resultAsText .= 'failed because no exception was thrown\n';
+
+    return $resultAsText;
 }

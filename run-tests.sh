@@ -1,13 +1,26 @@
 #!/usr/bin/env sh
 
 TEST_HTML_DIRECTORY='build-test-image-html'
+REPLACE_DIRECTORY=false
+
+while getopts "y" opt; do
+  case $opt in
+    y) REPLACE_DIRECTORY=true ;;
+    \?) echo "Invalid option -$OPTARG" >&2 ;;
+  esac
+done
 
 if [ -d "$TEST_HTML_DIRECTORY" ]; then
-    read -p "Directory '$TEST_HTML_DIRECTORY' already exists. Do you want to replace it? (y/N) " answer
-    case $answer in
-        [Yy]* ) rm -rf $TEST_HTML_DIRECTORY; mkdir $TEST_HTML_DIRECTORY;;
-        * ) echo "Creation of the '$TEST_HTML_DIRECTORY' was cancelled."; exit;;
-    esac
+    if [ "$REPLACE_DIRECTORY" = true ]; then
+        rm -rf $TEST_HTML_DIRECTORY
+        mkdir $TEST_HTML_DIRECTORY
+    else
+        read -p "Directory '$TEST_HTML_DIRECTORY' already exists. Do you want to replace it? (y/N) " answer
+        case $answer in
+            [Yy]* ) rm -rf $TEST_HTML_DIRECTORY; mkdir $TEST_HTML_DIRECTORY;;
+            * ) echo "Creation of the '$TEST_HTML_DIRECTORY' was cancelled."; exit;;
+        esac
+    fi
 else
     mkdir $TEST_HTML_DIRECTORY
 fi

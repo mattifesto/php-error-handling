@@ -1,4 +1,4 @@
-FROM php:cli
+FROM php:cli AS development-environment
 
 
 
