@@ -26,15 +26,27 @@ final class ExceptionRenderer
             $currentThrowable = $currentThrowable->getPrevious();
         }
 
-        $errorIndex = 0;
+        $throwableIndex = 0;
+        $throwableCount = count($chronilogicalArrayOfThrowables);
 
-        foreach ($chronilogicalArrayOfThrowables as $currentThrowable) {
+        while ($throwableIndex < $throwableCount) {
+            $currentThrowable = $chronilogicalArrayOfThrowables[$throwableIndex];
+
             $errorText = ExceptionRenderer::singleThrowableToText(
                 $currentThrowable
             );
 
+            if ($throwableIndex === ($throwableCount - 1)) {
+                $title = "final exception of {$throwableCount}";
+            } else if ($throwableIndex === 0) {
+                $title = "first exception of {$throwableCount}";
+            } else {
+                $throwableNumber = $throwableIndex + 1;
+                $title = "exception {$throwableNumber} of {$throwableCount}";
+            }
+
             $errorText = <<<EOT
-            ---------- error index {$errorIndex} ----------
+            ---------- {$title} ----------
 
             {$errorText}
             EOT;
@@ -44,17 +56,17 @@ final class ExceptionRenderer
                 $errorText
             );
 
-            $errorIndex += 1;
+            $throwableIndex += 1;
         }
 
         $outermostMessage = $outermostThrowableArgument->getMessage();
 
         $exceptionText =
-        "error: \"{$outermostMessage}\"\n\n\n" .
-        implode(
-            "\n\n\n",
-            $chronilogicalArrayOfExceptionTexts
-        );
+            "final exception message: \"{$outermostMessage}\"\n\n\n" .
+            implode(
+                "\n\n\n",
+                $chronilogicalArrayOfExceptionTexts
+            );
 
         return $exceptionText;
     }
@@ -68,9 +80,15 @@ final class ExceptionRenderer
         Throwable $throwable
     ): string {
         $arrayOfCalls = $throwable->getTrace();
+        $reversedArrayOfCalls = array_reverse($arrayOfCalls);
         $arrayOfText = [];
+        $callIndex = 0;
+        $callCount = count($reversedArrayOfCalls);
 
-        foreach ($arrayOfCalls as $call) {
+        while ($callIndex < $callCount) {
+            $call = $reversedArrayOfCalls[$callIndex];
+            $callIndexAsString = sprintf('%02d', $callIndex);
+
             $file = $call['file'] ?? '';
             $line = $call['line'] ?? '';
             $class = $call['class'] ?? '';
@@ -83,18 +101,18 @@ final class ExceptionRenderer
             $function = "{$function}()";
 
             $text = <<<EOT
-            {$file}
-            line {$line}
-            {$function} was called
+            {$callIndexAsString}: {$function} was called
+                in {$file}
+                on line {$line}
             EOT;
 
             array_push(
                 $arrayOfText,
                 $text
             );
-        }
 
-        $arrayOfText = array_reverse($arrayOfText);
+            $callIndex += 1;
+        }
 
         $throwableClassName = get_class($throwable);
         $message = $throwable->getMessage();
@@ -102,10 +120,10 @@ final class ExceptionRenderer
         $line = $throwable->getLine();
 
         $text = <<<EOT
-        {$file}
-        line {$line}
-        a throwable with the class {$throwableClassName} was thrown
-        "{$message}"
+            "{$message}"
+            this {$throwableClassName} was thrown
+            in {$file}
+            on line {$line}
         EOT;
 
         array_push(
