@@ -78,11 +78,3 @@ RUN npm install -g jshint
 
 
 CMD ["sh", "-c", "sleep infinity"]
-
-
-
-# - - - - - - - - - - php-error-handling-test-image - - - - - - - - - -
-
-FROM php:apache AS php-error-handling-test-image
-
-COPY build-test-image-html /var/www/html
