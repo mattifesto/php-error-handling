@@ -41,6 +41,6 @@ cp -r test-project-assets/* $TEST_HTML_DIRECTORY/
         --tag php-error-handling-test:$DOCKER_TAG_BUILD_DATE \
         --tag php-error-handling-test:latest \
         .
-)
 
-docker compose -f run-tests-docker-compose.yaml run --rm php-error-handling-test
+    docker compose run --rm php-error-handling-test
+)
