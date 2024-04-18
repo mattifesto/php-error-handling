@@ -1,17 +1,44 @@
 <?php
 
-use \Mattifesto\ErrorHandling\ExceptionRenderer;
+use Mattifesto\ErrorHandling\ExceptionRenderer;
+use Monolog\Level;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\JsonFormatter;
 
 require('vendor/autoload.php');
 
-echo "test 1\n";
+// app step 1: the first thing needed is to get all errors and exceptions handled, and help would be appreciated
+
+// Mattifesto\ErrorHandling\Router::routeErrorsAndExceptionsToHandlers();
+
+
+// setting the time zone will format the dates in the log file in west coast time
+date_default_timezone_set('America/Los_Angeles');
+
+announce("test 1");
+
+$logFile = '/var/logs/php-error-handling-test/current.log';
 
 try {
+    // create a log channel
+    $logger = new Logger('php-error-handling-test');
+
+    $streamHandler = new StreamHandler($logFile, Level::Debug);
+
+    $jsonFormatter = new JsonFormatter();
+
+    $streamHandler->setFormatter($jsonFormatter);
+
+    $logger->pushHandler($streamHandler);
+
     function1();
 } catch (Throwable $throwable) {
     $text = ExceptionRenderer::exceptionToText($throwable);
 
-    echo "$text\n\n";
+    $logger->error($text);
+
+    echo file_get_contents($logFile);
 }
 
 /**
@@ -30,8 +57,6 @@ function function1(): void
 function function2(): void
 {
     try {
-        $randomInt = random_int(0, PHP_INT_MAX);
-
         throw new InvalidArgumentException(
             "this exception was thrown in function2()"
         );
@@ -76,7 +101,9 @@ function function2ErrorHandlerErrorHandler(
     );
 }
 
-echo "test 2\n";
+
+
+announce('test 2');
 
 try {
     throw new Exception("this is a single exception test");
@@ -84,4 +111,19 @@ try {
     $text = ExceptionRenderer::exceptionToText($throwable);
 
     echo "$text\n\n";
+}
+
+
+
+function announce(string $message): void
+{
+    echo <<<EOT
+
+        ----------------------------------------
+        $message
+        ----------------------------------------
+
+
+
+        EOT;
 }
