@@ -8,21 +8,16 @@ use Monolog\Formatter\JsonFormatter;
 
 require('vendor/autoload.php');
 
-// app step 1: the first thing needed is to get all errors and exceptions handled, and help would be appreciated
-
-// Mattifesto\ErrorHandling\Router::routeErrorsAndExceptionsToHandlers();
-
-
 // setting the time zone will format the dates in the log file in west coast time
 date_default_timezone_set('America/Los_Angeles');
 
 announce("test 1");
 
-$logFile = '/var/logs/php-error-handling-test/current.log';
+$logFile = '/var/log/test-app/test-app.log';
 
 try {
     // create a log channel
-    $logger = new Logger('php-error-handling-test');
+    $logger = new Logger('php-error-handling-test-app');
 
     $streamHandler = new StreamHandler($logFile, Level::Debug);
 
