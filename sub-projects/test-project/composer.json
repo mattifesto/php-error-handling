@@ -11,6 +11,7 @@
     ],
     "require":
     {
-        "mattifesto/error-handling": "@dev"
+        "mattifesto/error-handling": "@dev",
+        "monolog/monolog": "^3.5"
     }
 }
