@@ -1,0 +1,25 @@
+name:
+  php-error-handling-test-project
+
+services:
+
+  test-app:
+    build:
+      context: .
+      target: test-app
+    volumes:
+      - php-error-handling-test-app-logs:/var/logs/test-app
+
+
+
+  fluent-bit:
+    build:
+      context: .
+      target: fluent-bit
+    volumes:
+      - php-error-handling-test-app-logs:/var/logs/test-app
+
+
+
+volumes:
+  php-error-handling-test-app-logs:

@@ -1,9 +1,0 @@
-name:
-  php-error-handling-test-project
-
-services:
-  php-error-handling-test:
-    container_name:
-      php-error-handling-test-container
-    image:
-      php-error-handling-test:latest
