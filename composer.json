@@ -1,8 +1,8 @@
 {
     "autoload": {
-        "classmap": [
-            "src/"
-        ]
+        "psr-4": {
+            "Mattifesto\\ErrorHandling\\": "src/"
+        }
     },
     "description": "Error and exception handling.",
     "license": "MIT",
