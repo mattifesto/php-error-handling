@@ -1,6 +1,7 @@
 FROM fluent/fluent-bit AS fluent-bit
 
 COPY fluent-bit.conf /fluent-bit/etc/fluent-bit.conf
+COPY fluent-bit-test-app-parsers.conf /fluent-bit/etc/fluent-bit-test-app-parsers.conf
 
 
 
