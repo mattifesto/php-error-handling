@@ -8,7 +8,7 @@ services:
       context: .
       target: test-app
     volumes:
-      - php-error-handling-test-app-logs:/var/logs/test-app
+      - php-error-handling-test-app-logs:/var/log/test-app
 
 
 
@@ -16,8 +16,13 @@ services:
     build:
       context: .
       target: fluent-bit
+    environment:
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST}
+      OPENSEARCH_PORT: ${OPENSEARCH_PORT}
+      OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
     volumes:
-      - php-error-handling-test-app-logs:/var/logs/test-app
+      - php-error-handling-test-app-logs:/var/log/test-app
 
 
 
